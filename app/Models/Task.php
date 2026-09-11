@@ -16,13 +16,13 @@ class Task extends Model
         'status',
     ];
 
-    protected $casts = [
-        'deadline' => 'date',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'deadline' => 'date',
+        ];
+    }
 
-    /**
-     * Task berada di dalam satu project.
-     */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
