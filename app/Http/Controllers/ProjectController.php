@@ -40,6 +40,16 @@ class ProjectController extends Controller
             ->with('success', 'Project berhasil dibuat.');
     }
 
+<<<<<<< HEAD
+=======
+    public function show(Project $project)
+    {
+        $this->checkProjectAccess($project);
+
+        return view('projects.show', compact('project'));
+    }
+
+>>>>>>> 8ad96db (backup collaboration changes)
     public function edit(Project $project)
     {
         $this->authorizeOwner($project);
@@ -80,4 +90,22 @@ class ProjectController extends Controller
             abort(403);
         }
     }
+<<<<<<< HEAD
+=======
+
+    private function checkProjectAccess(Project $project)
+    {
+        $userId = Auth::id();
+
+        $isOwner = $project->owner_id === $userId;
+
+        $isMember = $project->members()
+            ->where('users.id', $userId)
+            ->exists();
+
+        if (!$isOwner && !$isMember) {
+            abort(403);
+        }
+    }
+>>>>>>> 8ad96db (backup collaboration changes)
 }
