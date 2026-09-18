@@ -40,7 +40,7 @@
 
             <form
                 method="POST"
-                action="{{ route('tasks.update', $task) }}"
+                action="{{ route('projects.tasks.update', [$task->project, $task]) }}"
             >
 
                 @csrf
@@ -92,24 +92,18 @@
                             class="w-full border border-gray-300 rounded-xl px-4 py-3"
                         >
 
-                            <option
-                                value="low"
-                                {{ $task->priority === 'low' ? 'selected' : '' }}
-                            >
+                            <option value="low"
+                                {{ $task->priority === 'low' ? 'selected' : '' }}>
                                 Low
                             </option>
 
-                            <option
-                                value="medium"
-                                {{ $task->priority === 'medium' ? 'selected' : '' }}
-                            >
+                            <option value="medium"
+                                {{ $task->priority === 'medium' ? 'selected' : '' }}>
                                 Medium
                             </option>
 
-                            <option
-                                value="high"
-                                {{ $task->priority === 'high' ? 'selected' : '' }}
-                            >
+                            <option value="high"
+                                {{ $task->priority === 'high' ? 'selected' : '' }}>
                                 High
                             </option>
 
@@ -147,24 +141,18 @@
                         class="w-full border border-gray-300 rounded-xl px-4 py-3"
                     >
 
-                        <option
-                            value="todo"
-                            {{ $task->status === 'todo' ? 'selected' : '' }}
-                        >
+                        <option value="todo"
+                            {{ $task->status === 'todo' ? 'selected' : '' }}>
                             Todo
                         </option>
 
-                        <option
-                            value="doing"
-                            {{ $task->status === 'doing' ? 'selected' : '' }}
-                        >
+                        <option value="doing"
+                            {{ $task->status === 'doing' ? 'selected' : '' }}>
                             Doing
                         </option>
 
-                        <option
-                            value="done"
-                            {{ $task->status === 'done' ? 'selected' : '' }}
-                        >
+                        <option value="done"
+                            {{ $task->status === 'done' ? 'selected' : '' }}>
                             Done
                         </option>
 
@@ -191,6 +179,7 @@
                     </button>
 
                 </div>
+
 
             </form>
 

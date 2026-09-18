@@ -36,11 +36,13 @@
         @endif
 
 
+
         <div class="bg-white rounded-2xl shadow-md p-6">
+
 
             <form
                 method="POST"
-                action="{{ route('tasks.store', $project) }}"
+                action="{{ route('projects.tasks.store', $project) }}"
             >
 
                 @csrf
@@ -64,6 +66,7 @@
                 </div>
 
 
+
                 <div class="mb-5">
 
                     <label class="block font-semibold mb-2">
@@ -77,6 +80,7 @@
                     >{{ old('description') }}</textarea>
 
                 </div>
+
 
 
                 <div class="grid md:grid-cols-2 gap-4 mb-5">
@@ -110,6 +114,7 @@
                     </div>
 
 
+
                     <div>
 
                         <label class="block font-semibold mb-2">
@@ -125,7 +130,9 @@
 
                     </div>
 
+
                 </div>
+
 
 
                 <div class="mb-6">
@@ -156,6 +163,8 @@
                 </div>
 
 
+
+
                 <div class="flex gap-3">
 
                     <a
@@ -175,7 +184,9 @@
 
                 </div>
 
+
             </form>
+
 
         </div>
 
