@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
 use Illuminate\Support\Facades\DB;
 
 class ProjectController extends Controller
@@ -15,12 +15,17 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::where('owner_id', Auth::id())
+        $projects = Project::with('tasks')
+            ->where('owner_id', auth()->id())
             ->latest()
             ->get();
 
-        return view('projects.index', compact('projects'));
+        return view(
+            'projects.index',
+            compact('projects')
+        );
     }
+
 
 
     /**
@@ -32,36 +37,39 @@ class ProjectController extends Controller
     }
 
 
+
     /**
      * Simpan project baru.
      */
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-        ]);
+        $validated = $request->validated();
+
 
         Project::create([
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
-            'owner_id' => Auth::id(),
+            'owner_id' => auth()->id(),
         ]);
+
 
         return redirect()
             ->route('projects.index')
-            ->with('success', 'Project berhasil dibuat.');
+            ->with('success','Project berhasil dibuat.');
     }
 
 
+
     /**
-     * Detail project.
+     * Detail project beserta task.
      */
     public function show(Project $project)
     {
-        $this->checkProjectAccess($project);
+        $this->authorize('view', $project);
+
 
         $project->load('tasks');
+
 
         return view(
             'projects.show',
@@ -70,12 +78,17 @@ class ProjectController extends Controller
     }
 
 
+
     /**
      * Form edit project.
      */
     public function edit(Project $project)
     {
-        $this->authorizeOwner($project);
+        $this->authorize(
+            'update',
+            $project
+        );
+
 
         return view(
             'projects.edit',
@@ -84,80 +97,67 @@ class ProjectController extends Controller
     }
 
 
+
     /**
      * Update project.
      */
-    public function update(Request $request, Project $project)
-    {
-        $this->authorizeOwner($project);
+    public function update(
+        UpdateProjectRequest $request,
+        Project $project
+    ) {
 
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
+        $this->authorize(
+            'update',
+            $project
+        );
+
+
+        $validated = $request->validated();
+
+
+        $project->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
         ]);
 
-        $project->update($validated);
 
         return redirect()
-            ->route('projects.index')
-            ->with('success', 'Project berhasil diperbarui.');
+            ->route('projects.show', $project)
+            ->with('success','Project berhasil diperbarui.');
     }
 
 
+
     /**
-     * Hapus project.
+     * Hapus project beserta task dan member.
      */
     public function destroy(Project $project)
     {
-        $this->authorizeOwner($project);
+        $this->authorize(
+            'delete',
+            $project
+        );
+
 
         DB::transaction(function () use ($project) {
 
+
             $project->tasks()->delete();
+
 
             $project->members()->detach();
 
+
             $project->delete();
+
 
         });
 
 
+
         return redirect()
             ->route('projects.index')
-            ->with('success', 'Project berhasil dihapus.');
-    }
-
-
-
-    /**
-     * Cek owner project.
-     */
-    private function authorizeOwner(Project $project)
-    {
-        if ($project->owner_id !== Auth::id()) {
-            abort(403);
-        }
-    }
-
-
-    /**
-     * Cek akses owner/member.
-     */
-    private function checkProjectAccess(Project $project)
-    {
-        $userId = Auth::id();
-
-        $isOwner = $project->owner_id === $userId;
-
-
-        $isMember = $project->members()
-            ->where('users.id', $userId)
-            ->exists();
-
-
-        if (!$isOwner && !$isMember) {
-            abort(403);
-        }
+            ->with('success','Project berhasil dihapus.');
     }
 
 }

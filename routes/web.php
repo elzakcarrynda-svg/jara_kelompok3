@@ -9,7 +9,6 @@ use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProgressController;
 
 
-
 /*
 |--------------------------------------------------------------------------
 | Public
@@ -19,10 +18,9 @@ use App\Http\Controllers\ProgressController;
 Route::view('/', 'welcome');
 
 
-
 /*
 |--------------------------------------------------------------------------
-| Dashboard
+| Dashboard & Profile
 |--------------------------------------------------------------------------
 */
 
@@ -86,7 +84,7 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Project / List
+    | Project / List Management
     |--------------------------------------------------------------------------
     */
 
@@ -99,7 +97,7 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Task
+    | Task Management
     |--------------------------------------------------------------------------
     */
 
@@ -137,7 +135,7 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Progress
+    | Progress Monitoring
     |--------------------------------------------------------------------------
     */
 
@@ -145,7 +143,6 @@ Route::middleware('auth')->group(function () {
         '/progress',
         [ProgressController::class, 'index']
     )->name('progress.index');
-
 
 });
 

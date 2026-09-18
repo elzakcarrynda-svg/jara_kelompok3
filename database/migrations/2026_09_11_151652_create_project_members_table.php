@@ -10,12 +10,13 @@ return new class extends Migration
 
     public function up(): void
     {
+        if (Schema::hasTable('project_members')) {
+            return;
+        }
 
         Schema::create('project_members', function (Blueprint $table) {
 
-
             $table->id();
-
 
 
             // Project yang diikuti
@@ -24,16 +25,13 @@ return new class extends Migration
                   ->cascadeOnDelete();
 
 
-
             // User anggota
             $table->foreignId('user_id')
                   ->constrained('users')
                   ->cascadeOnDelete();
 
 
-
             $table->timestamps();
-
 
 
             // Mencegah user masuk project yang sama dua kali
@@ -42,11 +40,9 @@ return new class extends Migration
                 'user_id'
             ]);
 
-
         });
 
     }
-
 
 
     public function down(): void

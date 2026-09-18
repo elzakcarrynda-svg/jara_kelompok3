@@ -10,30 +10,27 @@ return new class extends Migration
 
     public function up(): void
     {
+        if (Schema::hasTable('projects')) {
+            return;
+        }
 
         Schema::create('projects', function (Blueprint $table) {
 
-
             $table->id();
-
 
             // Nama project/list
             $table->string('name');
 
-
             // Deskripsi project
             $table->text('description')
                   ->nullable();
-
 
             // User pembuat project
             $table->foreignId('owner_id')
                   ->constrained('users')
                   ->cascadeOnDelete();
 
-
             $table->timestamps();
-
 
         });
 
