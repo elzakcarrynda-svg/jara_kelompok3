@@ -6,10 +6,12 @@ use App\Models\Project;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+
 class ProjectController extends Controller
 {
+
     /**
-     * Menampilkan semua project milik user.
+     * Menampilkan daftar project milik user.
      */
     public function index()
     {
@@ -24,18 +26,18 @@ class ProjectController extends Controller
         );
     }
 
+
     /**
-     * Menampilkan form membuat project.
+     * Menampilkan form tambah project.
      */
     public function create()
     {
         return view('projects.create');
     }
 
+
     /**
      * Menyimpan project baru.
-     *
-     * US-06
      */
     public function store(StoreProjectRequest $request)
     {
@@ -52,14 +54,12 @@ class ProjectController extends Controller
             ->with('success','Project berhasil dibuat.');
     }
 
+
     /**
      * Menampilkan detail project beserta task.
-     *
-     * US-08
      */
     public function show(Project $project)
     {
-        // User hanya boleh melihat project miliknya.
         $this->authorize('view',$project);
 
         $project->load('tasks');
@@ -70,13 +70,12 @@ class ProjectController extends Controller
         );
     }
 
+
     /**
      * Menampilkan form edit project.
-     *
-     * US-07
      */
     public function edit(Project $project)
-{
+    {
         $this->authorize(
             'update',
             $project
@@ -88,15 +87,15 @@ class ProjectController extends Controller
         );
     }
 
+
     /**
-     * Mengubah project.
-     *
-     * US-07
+     * Update project.
      */
     public function update(
         UpdateProjectRequest $request,
         Project $project
     ) {
+
         $this->authorize('update',$project);
 
         $validated = $request->validated();
@@ -108,18 +107,16 @@ class ProjectController extends Controller
 
         return redirect()
             ->route('projects.show', $project)
-            ->with('success', 'Project berhasil diperbarui.');
+            ->with('success','Project berhasil diperbarui.');
     }
 
+
     /**
-     * Menghapus project.
-     *
-     * US-07
+     * Hapus project.
      */
     public function destroy(Project $project)
-{
+    {
         $this->authorize('delete',$project);
-
 
         DB::transaction(function() use ($project){
 
@@ -136,4 +133,5 @@ class ProjectController extends Controller
             ->route('projects.index')
             ->with('success','Project berhasil dihapus.');
     }
+
 }

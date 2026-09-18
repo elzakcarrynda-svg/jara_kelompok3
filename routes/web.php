@@ -1,26 +1,90 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
-use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\ProjectMemberController;
+use App\Http\Controllers\ProgressController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+/*
+|--------------------------------------------------------------------------
+| Public
+|--------------------------------------------------------------------------
+*/
+
+Route::view('/', 'welcome');
+
+
+/*
+|--------------------------------------------------------------------------
+| Dashboard & Profile
+|--------------------------------------------------------------------------
+*/
+
+Route::view('dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+
+Route::view('profile', 'profile')
+    ->middleware(['auth'])
+    ->name('profile');
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Admin
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        Route::get(
+            '/users',
+            [UserManagementController::class, 'index']
+        )->name('users.index');
+
+
+        Route::get(
+            '/users/create',
+            [UserManagementController::class, 'create']
+        )->name('users.create');
+
+
+        Route::post(
+            '/users',
+            [UserManagementController::class, 'store']
+        )->name('users.store');
+
+
+        Route::delete(
+            '/users/{user}',
+            [UserManagementController::class, 'destroy']
+        )->name('users.destroy');
+
+    });
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Application
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware('auth')->group(function () {
-
-    Route::view('dashboard', 'dashboard')
-        ->name('dashboard');
-
-    Route::view('profile', 'profile')
-        ->name('profile');
 
 
     /*
     |--------------------------------------------------------------------------
-    | Project
+    | Project / List Management
     |--------------------------------------------------------------------------
     */
 
@@ -30,55 +94,57 @@ Route::middleware('auth')->group(function () {
     );
 
 
+
     /*
     |--------------------------------------------------------------------------
-    | Task
+    | Task Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::resource(
+        'projects.tasks',
+        TaskController::class
+    )->except(['show']);
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Collaboration
     |--------------------------------------------------------------------------
     */
 
     Route::get(
-        '/projects/{project}/tasks/create',
-        [TaskController::class, 'create']
-    )->name('tasks.create');
+        '/projects/{project}/members',
+        [ProjectMemberController::class, 'index']
+    )->name('projects.members.index');
 
 
     Route::post(
-        '/projects/{project}/tasks',
-        [TaskController::class, 'store']
-    )->name('tasks.store');
-
-
-    Route::get(
-        '/tasks/{task}/edit',
-        [TaskController::class, 'edit']
-    )->name('tasks.edit');
-
-
-    Route::put(
-        '/tasks/{task}',
-        [TaskController::class, 'update']
-    )->name('tasks.update');
+        '/projects/{project}/members',
+        [ProjectMemberController::class, 'store']
+    )->name('projects.members.store');
 
 
     Route::delete(
-        '/tasks/{task}',
-        [TaskController::class, 'destroy']
-    )->name('tasks.destroy');
+        '/projects/{project}/members/{user}',
+        [ProjectMemberController::class, 'destroy']
+    )->name('projects.members.destroy');
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Progress Monitoring
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/progress',
+        [ProgressController::class, 'index']
+    )->name('progress.index');
 
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| Admin
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
-    Route::get('/users/create', [UserManagementController::class, 'create'])->name('users.create');
-    Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
-    Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
-});
 
 require __DIR__.'/auth.php';
