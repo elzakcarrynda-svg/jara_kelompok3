@@ -9,8 +9,20 @@ use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProgressController;
 
 
+/*
+|--------------------------------------------------------------------------
+| Public
+|--------------------------------------------------------------------------
+*/
+
 Route::view('/', 'welcome');
 
+
+/*
+|--------------------------------------------------------------------------
+| Dashboard & Profile
+|--------------------------------------------------------------------------
+*/
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
@@ -34,22 +46,26 @@ Route::middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
 
-        Route::get('/users',
+        Route::get(
+            '/users',
             [UserManagementController::class, 'index']
         )->name('users.index');
 
 
-        Route::get('/users/create',
+        Route::get(
+            '/users/create',
             [UserManagementController::class, 'create']
         )->name('users.create');
 
 
-        Route::post('/users',
+        Route::post(
+            '/users',
             [UserManagementController::class, 'store']
         )->name('users.store');
 
 
-        Route::delete('/users/{user}',
+        Route::delete(
+            '/users/{user}',
             [UserManagementController::class, 'destroy']
         )->name('users.destroy');
 
@@ -66,14 +82,25 @@ Route::middleware(['auth', 'admin'])
 Route::middleware('auth')->group(function () {
 
 
-    // Project CRUD
+    /*
+    |--------------------------------------------------------------------------
+    | Project / List Management
+    |--------------------------------------------------------------------------
+    */
+
     Route::resource(
         'projects',
         ProjectController::class
     );
 
 
-    // Task CRUD
+
+    /*
+    |--------------------------------------------------------------------------
+    | Task Management
+    |--------------------------------------------------------------------------
+    */
+
     Route::resource(
         'projects.tasks',
         TaskController::class
@@ -81,7 +108,11 @@ Route::middleware('auth')->group(function () {
 
 
 
-    // Collaboration
+    /*
+    |--------------------------------------------------------------------------
+    | Collaboration
+    |--------------------------------------------------------------------------
+    */
 
     Route::get(
         '/projects/{project}/members',
@@ -102,7 +133,11 @@ Route::middleware('auth')->group(function () {
 
 
 
-    // Progress
+    /*
+    |--------------------------------------------------------------------------
+    | Progress Monitoring
+    |--------------------------------------------------------------------------
+    */
 
     Route::get(
         '/progress',
