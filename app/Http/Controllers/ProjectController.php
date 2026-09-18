@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
-use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
 class ProjectController extends Controller
 {
     /**
@@ -36,23 +37,19 @@ class ProjectController extends Controller
      *
      * US-06
      */
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         Project::create([
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
-
             'owner_id' => auth()->id(),
         ]);
 
         return redirect()
             ->route('projects.index')
-            ->with('success', 'Project berhasil dibuat.');
+            ->with('success','Project berhasil dibuat.');
     }
 
     /**
@@ -63,10 +60,7 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
         // User hanya boleh melihat project miliknya.
-        abort_unless(
-            $project->owner_id === auth()->id(),
-            403
-        );
+        $this->authorize('view',$project);
 
         $project->load('tasks');
 
@@ -82,10 +76,10 @@ class ProjectController extends Controller
      * US-07
      */
     public function edit(Project $project)
-    {
-        abort_unless(
-            $project->owner_id === auth()->id(),
-            403
+{
+        $this->authorize(
+            'update',
+            $project
         );
 
         return view(
@@ -100,18 +94,12 @@ class ProjectController extends Controller
      * US-07
      */
     public function update(
-        Request $request,
+        UpdateProjectRequest $request,
         Project $project
     ) {
-        abort_unless(
-            $project->owner_id === auth()->id(),
-            403
-        );
+        $this->authorize('update',$project);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $project->update([
             'name' => $validated['name'],
@@ -129,16 +117,23 @@ class ProjectController extends Controller
      * US-07
      */
     public function destroy(Project $project)
-    {
-        abort_unless(
-            $project->owner_id === auth()->id(),
-            403
-        );
+{
+        $this->authorize('delete',$project);
 
-        $project->delete();
+
+        DB::transaction(function() use ($project){
+
+            $project->tasks()->delete();
+
+            $project->members()->detach();
+
+            $project->delete();
+
+        });
+
 
         return redirect()
             ->route('projects.index')
-            ->with('success', 'Project berhasil dihapus.');
+            ->with('success','Project berhasil dihapus.');
     }
 }
