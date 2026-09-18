@@ -40,8 +40,6 @@ class ProjectController extends Controller
             ->with('success', 'Project berhasil dibuat.');
     }
 
-<<<<<<< HEAD
-=======
     public function show(Project $project)
     {
         $this->checkProjectAccess($project);
@@ -49,7 +47,6 @@ class ProjectController extends Controller
         return view('projects.show', compact('project'));
     }
 
->>>>>>> 8ad96db (backup collaboration changes)
     public function edit(Project $project)
     {
         $this->authorizeOwner($project);
@@ -90,8 +87,6 @@ class ProjectController extends Controller
             abort(403);
         }
     }
-<<<<<<< HEAD
-=======
 
     private function checkProjectAccess(Project $project)
     {
@@ -107,5 +102,4 @@ class ProjectController extends Controller
             abort(403);
         }
     }
->>>>>>> 8ad96db (backup collaboration changes)
 }
